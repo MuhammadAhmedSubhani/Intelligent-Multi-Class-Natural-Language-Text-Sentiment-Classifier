@@ -1,0 +1,11 @@
+# Data set taken from hugging face
+# Using it via pandas read_csv function
+# Dataset Name: Sp1786/multiclass-sentiment-analysis-dataset
+
+import pandas as pd
+splits = {
+    'train': 'train_df.csv', 
+    'validation': 'val_df.csv', 
+    'test': 'test_df.csv'
+    }
+df = pd.read_csv("hf://datasets/Sp1786/multiclass-sentiment-analysis-dataset/" + splits["train"])
