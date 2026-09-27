@@ -6,6 +6,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
+from pathlib import Path
 
 def main():
 
@@ -37,6 +38,27 @@ def main():
 
     # Transform test text using the same TF-IDF vocabulary
     X_test = vectorizer.transform(X_test_text)
+    # Path(__file__) is '.../src/train.py'
+    # .parent is '.../src'
+    # .parent.parent is your project root folder
+    BASE_DIR = Path(__file__).resolve().parent.parent
+    MODEL_DIR = BASE_DIR / "models"
+
+    # Ensure the models directory exists automatically
+    MODEL_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Save test data for evaluation
+    test_data_file_path = MODEL_DIR / "test_data.pkl"
+
+    joblib.dump(
+        {
+            "X_test": X_test,
+            "y_test": y_test
+        },
+        test_data_file_path
+    )
+
+    print(f"Test data saved successfully to: {test_data_file_path}")
 
     # Create Logistic Regression classifier
     model = LogisticRegression(
@@ -45,30 +67,25 @@ def main():
 
     # Train the model
     model.fit(X_train, y_train)
+
     print("Model training completed.")
-    # Save the trained model and TF-IDF vectorizer
-    joblib.dump(
-        {
-            "model": model,
-            "vectorizer": vectorizer
-        },
-        "../models/sentiment_model.pkl"
-    )
 
-    print("Model and vectorizer saved successfully.")
+    # Save the trained model
+    model_file_path = MODEL_DIR / "sentiment_model.pkl"
 
-    # Make predictions on the test data
-    predictions = model.predict(X_test)
+    joblib.dump(model, model_file_path)
+
+    print(f"Model saved successfully to: {model_file_path}")
+
+    # Save the vectorizer separately
+    vectorizer_file_path = MODEL_DIR / "tfidf_vectorizer.pkl"
+
+    joblib.dump(vectorizer, vectorizer_file_path)
+
+    print(f"Vectorizer saved successfully to: {vectorizer_file_path}")
+
     
-    # Calculate accuracy
-    accuracy = accuracy_score(y_test, predictions)
-    print("Accuracy:", accuracy)
-
-    # Generate classification report
-    report = classification_report(y_test, predictions)
-    print("\nClassification Report:")
-    print(report)
-
+    
 
 
 if __name__ == "__main__":
