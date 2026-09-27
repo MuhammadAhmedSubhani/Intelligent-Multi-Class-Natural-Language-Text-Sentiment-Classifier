@@ -1,0 +1,6 @@
+pandas → dataset handling
+scikit-learn → TF-IDF, Logistic Regression, metrics
+nltk → preprocessing and lemmatization
+joblib → saving/loading model and vectorizer
+matplotlib → confusion matrix figure
+seaborn → confusion matrix visualization

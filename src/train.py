@@ -5,22 +5,31 @@ from preprocessing import preprocess_text
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report
 from pathlib import Path
+
 
 def main():
 
-    # Load the training dataset
+    # Project root folder
+    BASE_DIR = Path(__file__).resolve().parent.parent
+
+    # Models folder
+    MODEL_DIR = BASE_DIR / "models"
+
+    # Load the local training dataset
     df = pd.read_csv(
-        "hf://datasets/Sp1786/multiclass-sentiment-analysis-dataset/train_df.csv"
+        BASE_DIR / "data" / "dataset.csv"
     )
 
+    print(f"Dataset loaded successfully: {df.shape}")
+
+    # Preprocess the text
     df["cleaned_text"] = df["text"].apply(preprocess_text)
-    
+
     # Define input features and target labels
     X = df["cleaned_text"]
     y = df["sentiment"]
-    
+
     # Split data into training and testing sets
     X_train_text, X_test_text, y_train, y_test = train_test_split(
         X,
@@ -30,6 +39,9 @@ def main():
         stratify=y
     )
 
+    print(f"Training samples: {len(X_train_text)}")
+    print(f"Testing samples: {len(X_test_text)}")
+
     # Create TF-IDF vectorizer
     vectorizer = TfidfVectorizer()
 
@@ -38,13 +50,11 @@ def main():
 
     # Transform test text using the same TF-IDF vocabulary
     X_test = vectorizer.transform(X_test_text)
-    # Path(__file__) is '.../src/train.py'
-    # .parent is '.../src'
-    # .parent.parent is your project root folder
-    BASE_DIR = Path(__file__).resolve().parent.parent
-    MODEL_DIR = BASE_DIR / "models"
 
-    # Ensure the models directory exists automatically
+    print(f"TF-IDF training shape: {X_train.shape}")
+    print(f"TF-IDF testing shape: {X_test.shape}")
+
+    # Ensure the models directory exists
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
     # Save test data for evaluation
@@ -83,9 +93,6 @@ def main():
     joblib.dump(vectorizer, vectorizer_file_path)
 
     print(f"Vectorizer saved successfully to: {vectorizer_file_path}")
-
-    
-    
 
 
 if __name__ == "__main__":
