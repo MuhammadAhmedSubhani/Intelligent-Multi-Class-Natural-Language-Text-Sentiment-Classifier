@@ -1,53 +1,472 @@
 # Intelligent Multi-Class Natural Language Text Sentiment Classifier
 
-## Project Overview
+An end-to-end Natural Language Processing (NLP) and Machine Learning project that classifies English text into three sentiment categories:
 
-This project is a multi-class Natural Language Processing (NLP) sentiment classification system developed as part of an AI/ML internship task.
+- **Negative**
+- **Neutral**
+- **Positive**
 
-The system takes an input sentence and classifies it into one of three sentiment categories:
-
-* Negative
-* Neutral
-* Positive
-
-The project uses Natural Language Processing techniques for text preprocessing, TF-IDF for converting text into numerical features, and Logistic Regression for sentiment classification.
+The project covers the complete workflow from raw text preprocessing and feature extraction to model training, evaluation, prediction, and an interactive Flask web application.
 
 ---
 
-## Project Objectives
+## Project Overview
 
-The main objectives of this project are to:
+This project was developed as an NLP / AI-ML internship project and demonstrates how unstructured natural-language text can be converted into numerical features and classified using a supervised machine-learning model.
 
-* Preprocess natural language text.
-* Remove unnecessary words and punctuation.
-* Apply POS-aware lemmatization.
-* Convert text into numerical representations using TF-IDF.
-* Train a multi-class sentiment classification model.
-* Evaluate the model using Accuracy and F1-score.
-* Visualize classification performance using a confusion matrix.
-* Predict the sentiment of new user-provided sentences.
+### Pipeline
+
+```text
+Raw Text
+   ↓
+Text Preprocessing
+   ↓
+Tokenization
+   ↓
+Stopword Removal
+   ↓
+POS Tagging
+   ↓
+WordNet POS Mapping
+   ↓
+Lemmatization
+   ↓
+TF-IDF Vectorization
+   ↓
+Logistic Regression
+   ↓
+Sentiment Prediction
+   ↓
+Evaluation
+   ↓
+Flask Web Application
+```
+
+---
+
+## Features
+
+- Multi-class sentiment classification
+- Three sentiment classes: negative, neutral, positive
+- NLTK-based text preprocessing
+- Lowercasing
+- Punctuation removal
+- Tokenization
+- Stopword removal
+- Part-of-Speech (POS) tagging
+- WordNet POS mapping
+- POS-aware lemmatization
+- TF-IDF feature extraction
+- Logistic Regression classifier
+- Train/test split with stratification
+- Accuracy, precision, recall and F1-score evaluation
+- Confusion matrix
+- Prediction probabilities
+- Saved trained model and TF-IDF vectorizer using Joblib
+- Interactive Flask web application
+- Responsive HTML/CSS/JavaScript frontend
+- API endpoint for predictions
 
 ---
 
 ## Dataset
 
-The project uses the **Multiclass Sentiment Analysis Dataset**.
+The project uses a multi-class sentiment dataset containing **31,232 text records**.
 
-The dataset contains:
+### Classes
 
-* **31,232 text samples**
-* **4 columns**
-* Three sentiment classes:
+| Class | Meaning |
+|---|---|
+| Negative | Text expressing an unfavorable or negative sentiment |
+| Neutral | Text with neutral, factual, or less clearly emotional sentiment |
+| Positive | Text expressing a favorable or positive sentiment |
 
-  * Negative
-  * Neutral
-  * Positive
+### Dataset columns
 
-The dataset is stored locally in:
+- `id` — record identifier
+- `text` — original input text
+- `label` — original numeric class
+- `sentiment` — sentiment class
+
+### Label mapping
+
+```text
+0 → negative
+1 → neutral
+2 → positive
+```
+
+The dataset is stored locally at:
 
 ```text
 data/dataset.csv
 ```
+
+---
+
+## Text Preprocessing
+
+The preprocessing pipeline is implemented in:
+
+```text
+src/preprocessing.py
+```
+
+### 1. Lowercasing
+
+```python
+text = text.lower()
+```
+
+Example:
+
+```text
+"I LOVE THIS!"
+        ↓
+"i love this!"
+```
+
+### 2. Punctuation Removal
+
+```python
+text = text.translate(
+    str.maketrans("", "", string.punctuation)
+)
+```
+
+Example:
+
+```text
+"Excellent!!!"
+      ↓
+"Excellent"
+```
+
+### 3. Tokenization
+
+```python
+tokens = word_tokenize(text)
+```
+
+Example:
+
+```text
+"I love this movie."
+        ↓
+["I", "love", "this", "movie", "."]
+```
+
+### 4. Stopword Removal
+
+```python
+stop_words = set(stopwords.words("english"))
+
+filtered_tokens = []
+
+for token in tokens:
+    if token not in stop_words:
+        filtered_tokens.append(token)
+```
+
+### 5. POS Tagging
+
+```python
+pos_tags = pos_tag(filtered_tokens)
+```
+
+POS tagging identifies grammatical roles such as nouns, verbs, adjectives, and adverbs.
+
+### 6. WordNet POS Mapping
+
+NLTK POS tags are converted into WordNet-compatible tags:
+
+```text
+J → adjective
+V → verb
+N → noun
+R → adverb
+```
+
+### 7. Lemmatization
+
+```python
+lemmatized_token = lemmatizer.lemmatize(
+    token,
+    get_wordnet_pos(tag)
+)
+```
+
+Example:
+
+```text
+"loved" → "love"
+"running" → "run"
+"cars" → "car"
+```
+
+Example complete transformation:
+
+```text
+"I absolutely LOVED this movie!!!"
+                ↓
+"absolutely love movie"
+```
+
+---
+
+## TF-IDF Feature Extraction
+
+TF-IDF (Term Frequency-Inverse Document Frequency) converts cleaned text into numerical features that can be used by the machine-learning model.
+
+```python
+vectorizer = TfidfVectorizer()
+
+X_train = vectorizer.fit_transform(X_train_text)
+X_test = vectorizer.transform(X_test_text)
+```
+
+### Important
+
+The vectorizer is fitted **only on the training data**:
+
+```python
+fit_transform(X_train_text)
+```
+
+The test data uses:
+
+```python
+transform(X_test_text)
+```
+
+This prevents test-data leakage.
+
+### Project dimensions
+
+```text
+Training samples: 24,985
+Testing samples: 6,247
+
+TF-IDF training shape: (24985, 25182)
+TF-IDF testing shape:  (6247, 25182)
+```
+
+---
+
+## Model
+
+The classifier is:
+
+**Logistic Regression**
+
+```python
+from sklearn.linear_model import LogisticRegression
+
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train, y_train)
+```
+
+Logistic Regression is a common and effective baseline for text classification, especially when combined with TF-IDF features.
+
+---
+
+## Evaluation
+
+The trained model was evaluated on **6,247 unseen test samples**.
+
+### Results
+
+| Metric | Result |
+|---|---:|
+| Accuracy | **65.71%** |
+| Macro F1-score | **0.66** |
+| Weighted F1-score | **0.66** |
+
+### Per-class performance
+
+| Class | Precision | Recall | F1-score |
+|---|---:|---:|---:|
+| Negative | 0.66 | 0.60 | 0.63 |
+| Neutral | 0.59 | 0.65 | 0.62 |
+| Positive | 0.74 | 0.72 | 0.73 |
+
+### Confusion Matrix
+
+```text
+                 Predicted
+              Neg   Neu   Pos
+
+Actual Neg   1088   600   133
+Actual Neu    421  1514   395
+Actual Pos    128   465  1503
+```
+
+The diagonal values represent correct predictions.
+
+---
+
+## Prediction
+
+The project includes an interactive prediction script:
+
+```text
+src/predict.py
+```
+
+Example:
+
+```text
+Enter a sentence: I absolutely love this product!
+
+Predicted Sentiment: positive
+
+Prediction Probabilities:
+negative: 3.17%
+neutral: 2.23%
+positive: 94.60%
+```
+
+### Important distinction
+
+A prediction probability such as:
+
+```text
+positive: 94.60%
+```
+
+is the model's probability estimate for **that individual input**.
+
+It is **not** the same thing as the model's test accuracy.
+
+The overall test accuracy of this project is approximately:
+
+```text
+65.71%
+```
+
+---
+
+## Known Model Limitations
+
+This project is a classical TF-IDF + Logistic Regression baseline. It does not understand language in the same way as a modern large language model or transformer-based NLP system.
+
+For example, a sentence such as:
+
+```text
+"I didn't like that movie."
+```
+
+can sometimes be misclassified.
+
+This can happen because:
+
+- TF-IDF represents word statistics rather than full semantic meaning.
+- Logistic Regression learns statistical relationships from the training data.
+- Negation and context can be difficult for a bag-of-words-style representation.
+- The model has approximately 65.71% test accuracy, so incorrect predictions are expected.
+- The current preprocessing removes punctuation, so contractions such as `didn't` become `didnt`.
+
+These limitations are useful observations rather than frontend errors. Improving them would require changes such as better contraction/negation handling, n-grams, hyperparameter tuning, a larger or improved dataset, or a more advanced NLP model.
+
+---
+
+## Saved Model Files
+
+The trained artifacts are stored in:
+
+```text
+models/
+├── sentiment_model.pkl
+├── tfidf_vectorizer.pkl
+└── test_data.pkl
+```
+
+They can be loaded using:
+
+```python
+import joblib
+
+model = joblib.load("models/sentiment_model.pkl")
+vectorizer = joblib.load("models/tfidf_vectorizer.pkl")
+```
+
+---
+
+## Web Application
+
+The project also contains an interactive web application built with:
+
+- Flask
+- HTML
+- CSS
+- JavaScript
+- Existing trained Logistic Regression model
+- Existing TF-IDF vectorizer
+
+### Web application workflow
+
+```text
+User enters text
+      ↓
+JavaScript sends request
+      ↓
+Flask API receives text
+      ↓
+NLTK preprocessing
+      ↓
+Saved TF-IDF vectorizer
+      ↓
+Saved Logistic Regression model
+      ↓
+Prediction + probabilities
+      ↓
+JSON response
+      ↓
+Frontend displays result
+```
+
+### Frontend features
+
+- Text input area
+- Character counter
+- Positive / neutral / negative example buttons
+- Analyze Sentiment button
+- Predicted sentiment display
+- Probability bars for all three classes
+- Model information
+- NLP pipeline visualization
+- Project performance metrics
+- Responsive dashboard layout
+
+The frontend documentation is available in:
+
+```text
+README_FRONTEND_SECTION.md
+```
+
+---
+
+## Flask API
+
+The application exposes prediction functionality through a Flask endpoint.
+
+The frontend sends the user's text to the backend, which returns the predicted sentiment and class probabilities.
+
+The application can be started with:
+
+```powershell
+py app.py
+```
+
+Then open:
+
+```text
+http://127.0.0.1:5000
+```
+
+Do **not** open the HTML file directly with Live Server for the full application.
+
+The HTML frontend depends on the Flask backend and its `/api/predict` endpoint.
 
 ---
 
@@ -78,210 +497,118 @@ Intelligent-Multi-Class-Natural-Language-Text-Sentiment-Classifier/
 ├── reports/
 │   └── Task_2_Report.pdf
 │
+├── frontend/
+│   ├── index.html
+│   ├── script.js
+│   └── style.css
+│
+├── app.py
 ├── requirements.txt
-└── README.md
+├── requirements_frontend.txt
+├── README.md
+├── README_FRONTEND_SECTION.md
+└── LICENSE
 ```
 
 ---
 
-## Text Preprocessing
+## Installation
 
-The text preprocessing pipeline is implemented in `src/preprocessing.py`.
+Install the required Python packages:
 
-The following techniques are applied:
+```powershell
+py -m pip install pandas scikit-learn nltk joblib matplotlib seaborn flask
+```
 
-1. Lowercasing
-2. Punctuation removal
-3. Tokenization
-4. Stopword removal
-5. Part-of-Speech (POS) tagging
-6. WordNet POS mapping
-7. POS-aware lemmatization
+Download the required NLTK resources:
 
-For example:
+```powershell
+py -c "import nltk; nltk.download('punkt'); nltk.download('punkt_tab'); nltk.download('stopwords'); nltk.download('wordnet'); nltk.download('averaged_perceptron_tagger'); nltk.download('averaged_perceptron_tagger_eng')"
+```
+
+---
+
+## Running the Project
+
+### Run the trained model prediction script
+
+From the project root:
+
+```powershell
+py src\predict.py
+```
+
+### Run evaluation
+
+```powershell
+py src\evaluate.py
+```
+
+### Run the web application
+
+```powershell
+py app.py
+```
+
+Open:
 
 ```text
-"I absolutely LOVED this movie!!!"
+http://127.0.0.1:5000
 ```
-
-is transformed into:
-
-```text
-"absolutely love movie"
-```
-
----
-
-## Feature Extraction
-
-After preprocessing, the text is converted into numerical features using **TF-IDF (Term Frequency-Inverse Document Frequency)**.
-
-The vectorizer is fitted only on the training data to avoid test-data leakage.
-
-The resulting feature dimensions are:
-
-```text
-Training data: (24985, 25182)
-Testing data:  (6247, 25182)
-```
-
----
-
-## Model
-
-The classification model used is **Logistic Regression** from Scikit-Learn.
-
-The model is configured with:
-
-```python
-LogisticRegression(max_iter=1000)
-```
-
-The model is trained using the TF-IDF features and the corresponding sentiment labels.
-
----
-
-## Train/Test Split
-
-The dataset is divided into:
-
-* **80% training data:** 24,985 samples
-* **20% testing data:** 6,247 samples
-
-A fixed `random_state=42` is used to make the split reproducible.
-
-Stratification is also used to preserve the distribution of sentiment classes.
-
----
-
-## Model Evaluation
-
-The trained model was evaluated using:
-
-* Accuracy
-* Precision
-* Recall
-* F1-score
-* Confusion Matrix
-
-### Overall Results
-
-| Metric            | Result |
-| ----------------- | -----: |
-| Accuracy          | 65.71% |
-| Macro F1-score    |   0.66 |
-| Weighted F1-score |   0.66 |
-
-### Class-wise F1-score
-
-| Sentiment | F1-score |
-| --------- | -------: |
-| Negative  |     0.63 |
-| Neutral   |     0.62 |
-| Positive  |     0.73 |
-
----
-
-## Confusion Matrix
-
-The confusion matrix is stored at:
-
-```text
-results/confusion_matrix.png
-```
-
-The matrix is:
-
-```text
-[[1088, 600, 133],
- [421, 1514, 395],
- [128, 465, 1503]]
-```
-
-Rows represent the actual sentiment and columns represent the predicted sentiment.
-
----
-
-## Prediction
-
-The `src/predict.py` script allows the user to enter a new sentence and receive:
-
-* Predicted sentiment
-* Probability for each sentiment class
-
-Example:
-
-```text
-Enter a sentence: I absolutely love this product!
-
-Predicted Sentiment: positive
-
-Prediction Probabilities:
-negative: 3.17%
-neutral: 2.23%
-positive: 94.60%
-```
-
----
-
-## How to Run
-
-### 1. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 2. Train the model
-
-From the `src` directory:
-
-```bash
-python train.py
-```
-
-This creates the trained model, TF-IDF vectorizer, and test data inside the `models` directory.
-
-### 3. Evaluate the model
-
-```bash
-python evaluate.py
-```
-
-This generates the classification report, metrics file, and confusion matrix.
-
-### 4. Make predictions
-
-```bash
-python predict.py
-```
-
-Enter a sentence when prompted.
 
 ---
 
 ## Technologies Used
 
-* Python
-* NLTK
-* Pandas
-* Scikit-Learn
-* Joblib
-* Matplotlib
-* Seaborn
-* TF-IDF
-* Logistic Regression
+- Python
+- NLTK
+- Pandas
+- NumPy
+- Scikit-learn
+- Joblib
+- Matplotlib
+- Seaborn
+- Flask
+- HTML
+- CSS
+- JavaScript
 
 ---
 
-## Project Outcome
+## Learning Outcomes
 
-The project successfully implements an end-to-end multi-class sentiment classification pipeline, starting from raw text preprocessing and feature extraction and continuing through model training, evaluation, visualization, and prediction on new text.
+This project demonstrates practical understanding of:
 
-The trained model achieved **65.71% accuracy** and a **0.66 macro F1-score** on the held-out test set.
+- Natural Language Processing
+- Text preprocessing
+- Tokenization
+- Stopword removal
+- POS tagging
+- Lemmatization
+- TF-IDF
+- Supervised machine learning
+- Logistic Regression
+- Multiclass classification
+- Model evaluation
+- F1-score
+- Confusion matrices
+- Model persistence
+- REST-style API communication
+- Flask web integration
+- Frontend/backend integration
 
 ---
 
-## Internship Task
+## Project Status
 
-This project was developed as part of an **AI/ML internship task focused on Natural Language Processing and multi-class sentiment classification**.
+**Completed**
+
+The core NLP classifier, evaluation pipeline, saved model artifacts, and interactive Flask frontend are implemented and working.
+
+The current model is intentionally a classical ML baseline. Future improvements could focus on handling negation and contractions, tuning TF-IDF/model parameters, experimenting with n-grams, or using transformer-based NLP models.
+
+---
+
+## License
+
+This project is licensed under the MIT License. See `LICENSE` for details.
