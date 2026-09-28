@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sentiment Classifier | NLP Dashboard</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="topbar">
+    <div class="brand">
+        <div class="brand-icon">AI</div>
+        <div><h1>Sentiment Classifier</h1><p>Multi-Class NLP Analysis</p></div>
+    </div>
+    <div class="status-pill"><span class="status-dot"></span> Model Online</div>
+</header>
+
+<main class="container">
+<section class="hero">
+    <div class="eyebrow">NATURAL LANGUAGE PROCESSING</div>
+    <h2>Understand the sentiment<br><span>behind any text.</span></h2>
+    <p>Enter a sentence and let the trained machine-learning pipeline classify it as
+       <strong>negative</strong>, <strong>neutral</strong>, or <strong>positive</strong>.</p>
+</section>
+
+<section class="dashboard-grid">
+<div class="card analyzer-card">
+    <div class="card-heading">
+        <div><span class="card-label">TEXT INPUT</span><h3>Analyze a sentence</h3></div>
+        <span class="counter" id="charCount">0 / 2000</span>
+    </div>
+
+    <textarea id="textInput" maxlength="2000"
+      placeholder="Example: I absolutely love this product!"></textarea>
+
+    <div class="examples">
+        <button class="example-btn" data-text="I absolutely love this product!">Positive example</button>
+        <button class="example-btn" data-text="The service was okay, nothing special.">Neutral example</button>
+        <button class="example-btn" data-text="This is the worst product I have ever bought.">Negative example</button>
+    </div>
+
+    <button id="analyzeBtn" class="analyze-btn">
+        <span>Analyze Sentiment</span><span class="arrow">→</span>
+    </button>
+    <p id="errorMessage" class="error-message"></p>
+</div>
+
+<div class="card result-card">
+    <div class="card-heading">
+        <div><span class="card-label">PREDICTION</span><h3>Sentiment result</h3></div>
+        <span class="model-tag">Logistic Regression</span>
+    </div>
+
+    <div class="result-placeholder" id="placeholder">
+        <div class="placeholder-icon">✦</div>
+        <h4>Waiting for text</h4>
+        <p>Your prediction and class probabilities will appear here.</p>
+    </div>
+
+    <div class="result-content hidden" id="resultContent">
+        <div class="sentiment-display">
+            <div class="sentiment-icon" id="sentimentIcon">✓</div>
+            <div>
+                <span class="result-caption">PREDICTED SENTIMENT</span>
+                <div class="sentiment-name" id="sentimentName">positive</div>
+            </div>
+        </div>
+
+        <div class="confidence-box">
+            <div class="confidence-top">
+                <span>Prediction probability</span><strong id="confidenceValue">0%</strong>
+            </div>
+            <div class="confidence-track"><div class="confidence-fill" id="confidenceFill"></div></div>
+        </div>
+
+        <div class="probabilities">
+            <div class="probability-row"><div class="probability-label"><span>Negative</span><strong id="negativeValue">0%</strong></div><div class="bar-track"><div class="bar-fill" id="negativeBar"></div></div></div>
+            <div class="probability-row"><div class="probability-label"><span>Neutral</span><strong id="neutralValue">0%</strong></div><div class="bar-track"><div class="bar-fill" id="neutralBar"></div></div></div>
+            <div class="probability-row"><div class="probability-label"><span>Positive</span><strong id="positiveValue">0%</strong></div><div class="bar-track"><div class="bar-fill" id="positiveBar"></div></div></div>
+        </div>
+    </div>
+</div>
+</section>
+
+<section class="pipeline-card card">
+    <span class="card-label">MODEL PIPELINE</span>
+    <h3>From text to prediction</h3>
+    <div class="pipeline">
+        <div class="pipeline-step"><b>01</b><div><strong>Raw Text</strong><span>User sentence</span></div></div>
+        <i>→</i>
+        <div class="pipeline-step"><b>02</b><div><strong>Preprocessing</strong><span>Tokenization + lemmatization</span></div></div>
+        <i>→</i>
+        <div class="pipeline-step"><b>03</b><div><strong>TF-IDF</strong><span>Text → numerical features</span></div></div>
+        <i>→</i>
+        <div class="pipeline-step"><b>04</b><div><strong>Classifier</strong><span>Logistic Regression</span></div></div>
+    </div>
+</section>
+
+<section class="info-grid">
+    <div class="info-card"><strong>31,232</strong><span>Dataset samples</span></div>
+    <div class="info-card"><strong>3</strong><span>Sentiment classes</span></div>
+    <div class="info-card"><strong>65.71%</strong><span>Test accuracy</span></div>
+    <div class="info-card"><strong>0.66</strong><span>Macro F1-score</span></div>
+</section>
+</main>
+
+<footer><span>Intelligent Multi-Class Natural Language Text Sentiment Classifier</span><span>Python · NLTK · TF-IDF · Scikit-Learn</span></footer>
+<script src="/script.js"></script>
+</body>
+</html>
