@@ -1,176 +1,219 @@
-# Multi-Class Natural Language Text Sentiment Classifier
+# Intelligent Multi-Class Natural Language Text Sentiment Classifier
 
-## Project objective
+## Project Overview
 
-This project classifies short text messages into one of three sentiment
-categories:
+This project is a multi-class Natural Language Processing (NLP) sentiment classification system developed as part of an AI/ML internship task.
 
-- `negative`
-- `neutral`
-- `positive`
+The system takes an input sentence and classifies it into one of three sentiment categories:
 
-The pipeline cleans the text, converts it into TF-IDF features, trains a
-Logistic Regression classifier, evaluates the classifier, and supports
-predictions for new user-provided sentences.
+* Negative
+* Neutral
+* Positive
 
-## Project structure
+The project uses Natural Language Processing techniques for text preprocessing, TF-IDF for converting text into numerical features, and Logistic Regression for sentiment classification.
+
+---
+
+## Project Objectives
+
+The main objectives of this project are to:
+
+* Preprocess natural language text.
+* Remove unnecessary words and punctuation.
+* Apply POS-aware lemmatization.
+* Convert text into numerical representations using TF-IDF.
+* Train a multi-class sentiment classification model.
+* Evaluate the model using Accuracy and F1-score.
+* Visualize classification performance using a confusion matrix.
+* Predict the sentiment of new user-provided sentences.
+
+---
+
+## Dataset
+
+The project uses the **Multiclass Sentiment Analysis Dataset**.
+
+The dataset contains:
+
+* **31,232 text samples**
+* **4 columns**
+* Three sentiment classes:
+
+  * Negative
+  * Neutral
+  * Positive
+
+The dataset is stored locally in:
 
 ```text
-NLP-Sentiment-Classifier/
+data/dataset.csv
+```
+
+---
+
+## Project Structure
+
+```text
+Intelligent-Multi-Class-Natural-Language-Text-Sentiment-Classifier/
+│
 ├── data/
 │   └── dataset.csv
-├── models/
-│   ├── sentiment_model.pkl
-│   ├── tfidf_vectorizer.pkl
-│   └── test_data.pkl
-├── results/
-│   ├── classification_report.txt
-│   ├── confusion_matrix.png
-│   └── metrics.txt
+│
 ├── src/
 │   ├── preprocessing.py
 │   ├── train.py
 │   ├── evaluate.py
 │   └── predict.py
+│
+├── models/
+│   ├── sentiment_model.pkl
+│   ├── tfidf_vectorizer.pkl
+│   └── test_data.pkl
+│
+├── results/
+│   ├── classification_report.txt
+│   ├── confusion_matrix.png
+│   └── metrics.txt
+│
+├── reports/
+│   └── Task_2_Report.pdf
+│
 ├── requirements.txt
-├── LICENSE
 └── README.md
 ```
 
-## Dataset
+---
 
-The project uses the local [`data/dataset.csv`](data/dataset.csv) file. It
-contains 31,232 labelled text records with these columns:
+## Text Preprocessing
 
-| Column | Description |
-| --- | --- |
-| `id` | Record identifier |
-| `text` | Original text to classify |
-| `label` | Numeric label supplied with the dataset |
-| `sentiment` | Target class used for training |
+The text preprocessing pipeline is implemented in `src/preprocessing.py`.
 
-The sentiment distribution is:
+The following techniques are applied:
 
-| Sentiment | Records |
-| --- | ---: |
-| Negative | 9,105 |
-| Neutral | 11,649 |
-| Positive | 10,478 |
+1. Lowercasing
+2. Punctuation removal
+3. Tokenization
+4. Stopword removal
+5. Part-of-Speech (POS) tagging
+6. WordNet POS mapping
+7. POS-aware lemmatization
 
-## Text preprocessing
-
-[`src/preprocessing.py`](src/preprocessing.py) applies the following steps:
-
-1. Convert text to lowercase.
-2. Remove punctuation.
-3. Tokenize the text with NLTK.
-4. Remove English stopwords.
-5. Apply part-of-speech tagging.
-6. Lemmatize tokens using the POS-aware WordNet lemmatizer.
-
-The required NLTK resources are downloaded automatically when the preprocessing
-module is imported.
-
-## TF-IDF feature extraction
-
-[`src/train.py`](src/train.py) uses scikit-learn's
-`TfidfVectorizer` to represent the cleaned text numerically. The vectorizer is
-fit only on the training text, and the test text is transformed using that
-same learned vocabulary. The fitted vectorizer is saved as
-`models/tfidf_vectorizer.pkl`.
-
-## Logistic Regression classifier
-
-The classifier is scikit-learn's `LogisticRegression` with `max_iter=1000`.
-It learns the relationship between the TF-IDF features and the three sentiment
-classes. The trained model is saved as `models/sentiment_model.pkl`.
-
-## Train/test split
-
-The dataset is split into 80% training data and 20% test data using
-`train_test_split` with:
-
-- `random_state=42` for reproducibility
-- `stratify=y` to preserve the sentiment distribution
-
-This produces 24,985 training records and 6,247 test records. The test
-features and labels are saved to `models/test_data.pkl` for evaluation.
-
-## Evaluation metrics
-
-Run [`src/evaluate.py`](src/evaluate.py) after training to calculate accuracy,
-the per-class precision/recall/F1 report, macro F1-score, weighted F1-score,
-and a confusion matrix.
-
-The currently saved results are:
-
-| Metric | Score |
-| --- | ---: |
-| Accuracy | 0.6571 |
-| Macro F1-score | 0.6582 |
-| Weighted F1-score | 0.6579 |
-
-Per-class F1-scores from `results/classification_report.txt`:
-
-| Class | Precision | Recall | F1-score | Support |
-| --- | ---: | ---: | ---: | ---: |
-| Negative | 0.66 | 0.60 | 0.63 | 1,821 |
-| Neutral | 0.59 | 0.65 | 0.62 | 2,330 |
-| Positive | 0.74 | 0.72 | 0.73 | 2,096 |
-
-The full report is in
-[`results/classification_report.txt`](results/classification_report.txt),
-the aggregate metrics are in
-[`results/metrics.txt`](results/metrics.txt), and the visual confusion matrix
-is in [`results/confusion_matrix.png`](results/confusion_matrix.png).
-
-## How to run the project
-
-Run these commands from the project root.
-
-### 1. Install dependencies
-
-```bash
-python -m pip install -r requirements.txt
-```
-
-### 2. Train the model
-
-```bash
-python src/train.py
-```
-
-This preprocesses the dataset, trains the classifier, and creates the files in
-the `models/` directory.
-
-### 3. Evaluate the model
-
-```bash
-python src/evaluate.py
-```
-
-This updates the files in the `results/` directory.
-
-### 4. Predict a new sentence
-
-```bash
-python src/predict.py
-```
-
-Enter a sentence when prompted. The script prints the predicted sentiment and
-the probability assigned to each class.
-
-## Example prediction
-
-Example input:
+For example:
 
 ```text
-I absolutely loved this product!
+"I absolutely LOVED this movie!!!"
 ```
 
-Example output from the saved model:
+is transformed into:
 
 ```text
+"absolutely love movie"
+```
+
+---
+
+## Feature Extraction
+
+After preprocessing, the text is converted into numerical features using **TF-IDF (Term Frequency-Inverse Document Frequency)**.
+
+The vectorizer is fitted only on the training data to avoid test-data leakage.
+
+The resulting feature dimensions are:
+
+```text
+Training data: (24985, 25182)
+Testing data:  (6247, 25182)
+```
+
+---
+
+## Model
+
+The classification model used is **Logistic Regression** from Scikit-Learn.
+
+The model is configured with:
+
+```python
+LogisticRegression(max_iter=1000)
+```
+
+The model is trained using the TF-IDF features and the corresponding sentiment labels.
+
+---
+
+## Train/Test Split
+
+The dataset is divided into:
+
+* **80% training data:** 24,985 samples
+* **20% testing data:** 6,247 samples
+
+A fixed `random_state=42` is used to make the split reproducible.
+
+Stratification is also used to preserve the distribution of sentiment classes.
+
+---
+
+## Model Evaluation
+
+The trained model was evaluated using:
+
+* Accuracy
+* Precision
+* Recall
+* F1-score
+* Confusion Matrix
+
+### Overall Results
+
+| Metric            | Result |
+| ----------------- | -----: |
+| Accuracy          | 65.71% |
+| Macro F1-score    |   0.66 |
+| Weighted F1-score |   0.66 |
+
+### Class-wise F1-score
+
+| Sentiment | F1-score |
+| --------- | -------: |
+| Negative  |     0.63 |
+| Neutral   |     0.62 |
+| Positive  |     0.73 |
+
+---
+
+## Confusion Matrix
+
+The confusion matrix is stored at:
+
+```text
+results/confusion_matrix.png
+```
+
+The matrix is:
+
+```text
+[[1088, 600, 133],
+ [421, 1514, 395],
+ [128, 465, 1503]]
+```
+
+Rows represent the actual sentiment and columns represent the predicted sentiment.
+
+---
+
+## Prediction
+
+The `src/predict.py` script allows the user to enter a new sentence and receive:
+
+* Predicted sentiment
+* Probability for each sentiment class
+
+Example:
+
+```text
+Enter a sentence: I absolutely love this product!
+
 Predicted Sentiment: positive
 
 Prediction Probabilities:
@@ -178,3 +221,67 @@ negative: 3.17%
 neutral: 2.23%
 positive: 94.60%
 ```
+
+---
+
+## How to Run
+
+### 1. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Train the model
+
+From the `src` directory:
+
+```bash
+python train.py
+```
+
+This creates the trained model, TF-IDF vectorizer, and test data inside the `models` directory.
+
+### 3. Evaluate the model
+
+```bash
+python evaluate.py
+```
+
+This generates the classification report, metrics file, and confusion matrix.
+
+### 4. Make predictions
+
+```bash
+python predict.py
+```
+
+Enter a sentence when prompted.
+
+---
+
+## Technologies Used
+
+* Python
+* NLTK
+* Pandas
+* Scikit-Learn
+* Joblib
+* Matplotlib
+* Seaborn
+* TF-IDF
+* Logistic Regression
+
+---
+
+## Project Outcome
+
+The project successfully implements an end-to-end multi-class sentiment classification pipeline, starting from raw text preprocessing and feature extraction and continuing through model training, evaluation, visualization, and prediction on new text.
+
+The trained model achieved **65.71% accuracy** and a **0.66 macro F1-score** on the held-out test set.
+
+---
+
+## Internship Task
+
+This project was developed as part of an **AI/ML internship task focused on Natural Language Processing and multi-class sentiment classification**.
