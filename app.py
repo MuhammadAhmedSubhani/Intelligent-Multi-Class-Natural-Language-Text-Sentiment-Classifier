@@ -58,8 +58,10 @@ def predict():
         }
     })
 
+# Load model and vectorizer when the application starts
+load_artifacts()
+
 if __name__ == "__main__":
-    load_artifacts()
-    print("Model and TF-IDF vectorizer loaded successfully.")
+    print("Model and vectorizer loaded successfully.")
     print("Open http://127.0.0.1:5000")
     app.run(debug=True)
