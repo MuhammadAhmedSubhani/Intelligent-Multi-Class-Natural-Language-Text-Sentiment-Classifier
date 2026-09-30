@@ -10,7 +10,7 @@ if str(SRC_DIR) not in sys.path:
 
 from preprocessing import preprocess_text
 
-app = Flask(__name__, static_folder="frontend", static_url_path="")
+app = Flask(__name__, static_folder="Frontend", static_url_path="")
 MODEL_DIR = BASE_DIR / "models"
 MODEL_PATH = MODEL_DIR / "sentiment_model.pkl"
 VECTORIZER_PATH = MODEL_DIR / "tfidf_vectorizer.pkl"
