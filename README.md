@@ -10,6 +10,11 @@ The project covers the complete workflow from raw text preprocessing and feature
 
 ---
 
+## Live Preview
+Try the app in the browser here:
+
+https://intelligent-sentiment-classifier.onrender.com/
+##
 ## Project Overview
 
 This project was developed as an NLP / AI-ML internship project and demonstrates how unstructured natural-language text can be converted into numerical features and classified using a supervised machine-learning model.
